@@ -1,0 +1,160 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Basename;
+use Getopt::Long 'HelpMessage';
+
+my $usage=<<_EOH_;;
+----------------------------------------------
+This script is used to extract genes underlying the GO functional enrichment results from many files (or species)
+
+Usage: $0 --input *enrichment.txt
+The input name should have a pattern like "<species>_<enrichment>.txt" such as Apoly_enrichment.txt, and also separated as tabs
+
+Options:
+
+	--input,-i			your input enrichment files: could be many files (such as *_enrichment.txt) or a single file
+	--anotation,-a 		your anotation files to the genes under the functions file
+	--gene_column,-g 	which column is your gene_id in your anotation files
+	--func_column 		which column is your function name in your enrichment files
+	--functions 		your target functions need to be extracted
+	--output,-o 		the prefix of the output results
+	--help,-h 			Print this help
+
+				Kang 2021-7-12
+----------------------------------------------
+_EOH_
+;
+
+GetOptions('input:s{,}', \ my @input,
+	'ano:s', \ my $ano,
+	'gene_column:i', \ my $gene_column,
+	'func_column:i', \ my $func_column,
+	'functions:s', \ my $func_file,
+	'output:s', \ my $output, # the prefix of the output results
+	'help', \ my $help
+	);
+
+if ($help || (! @input) || (! $ano) || (! $gene_column) || (! $func_column) || (! $func_file) || (! $output)) {
+	die $usage; # all of these options are mandatory requirements
+}
+
+my (%func, %ano);
+my (@header, @spe);
+main: {
+	foreach my $txt (@input) {
+		my $dirname=dirname($txt);
+		$txt=basename($txt);
+		unless ($txt=~/.*_enrichment\.txt/) {
+			die "\nThe input name should have a pattern like \"<species>_<enrichment>.txt\" such as Apoly_enrichment.txt\n";
+		}
+		(my $spe)=$txt=~/(.*)_enrichment\.txt/;
+		push @spe, $spe;
+		my $i;
+		&read_file($dirname, $txt, $spe, $i);
+	}
+	&read_ano();
+	my $output=$output.".txt";
+	open OUTPUT, ">$output";
+	open FUNCTIONS, "$func_file";
+	while (<FUNCTIONS>) {
+		chomp;
+		my $go_name=$_;
+		s/^\s+//;
+		s/\s+$//;
+		foreach my $spe (@spe) {
+			if ($func{$spe}->{$go_name}->{'info'}) {
+				my $info=$func{$spe}->{$go_name}->{'info'};
+				print "$spe\t$go_name\t$info\n";
+			} else {
+				print "$spe\t$go_name\n";
+			}
+		}
+		foreach my $spe (@spe) {
+			if ($func{$spe}->{$go_name}->{'TestSet_Sequences'}) {
+				my @genes=@{$func{$spe}->{$go_name}->{'TestSet_Sequences'}};
+				foreach my $gene (@genes) {
+					my $ano_gene=$ano{$gene};
+					print OUTPUT "$spe\t$go_name\t$ano_gene\n";
+				}
+			}
+		}
+	}
+	exit(0);
+}
+
+####
+sub read_file {
+	my ($dirname, $txt, $spe, $i)=@_;
+	open TXT, "$dirname/$txt" or die "there is no $dirname/$txt\n";
+	while (<TXT>) {
+		chomp;
+		$i++;
+		if ($i==1) {
+			@header=split /\t/;
+			@header=&replace_space();
+		} else {
+			my @a=split /\t/;
+			my $go_name=$a[$func_column-1];
+			&build_func_hash(\@a, $spe, $go_name);
+			&check_column($spe, $dirname, $txt, $go_name);
+		}
+	}
+}
+
+sub replace_space { # replace the spaces within the name of header
+	for (my $i = 0; $i < @header; $i++) {
+		$header[$i]=~s/\s+/_/g;
+	}
+	return @header;
+}
+
+sub build_func_hash {
+	my ($ref, $spe, $go_name)=@_;
+	for (my $k = 0; $k < @header; $k++) {
+		$header[$k]=~s/^\s+//g;
+		$header[$k]=~s/\s+$//g;
+		unless ($k==$func_column-1) {
+			$func{$spe}->{$go_name}->{$header[$k]}=${$ref}[$k];
+			unless (($header[$k] eq 'TestSet_Sequences') ||($header[$k] eq 'RefSet_Sequences') || ()) {
+				$func{$spe}->{$go_name}->{'info'} .= ${$ref}[$k]."\t";
+			}
+		}
+	}
+	return %func;
+}
+
+sub check_column {
+	my ($spe, $dirname, $txt, $go_name)=@_;
+	if ($func{$spe}->{$go_name}->{'Nr_Test'} && $func{$spe}->{$go_name}->{'TestSet_Sequences'}) {
+		my $gene_num=$func{$spe}->{$go_name}->{'Nr_Test'};
+		my $genes=$func{$spe}->{$go_name}->{'TestSet_Sequences'};
+		my @genes=split /\;/, $genes;
+		if (@genes!=$gene_num) {
+			die "$dirname/$txt has an error: genes number in TestSet_Sequences is not equal to Nr_Test\n";
+		} else {
+			$func{$spe}->{$go_name}->{'TestSet_Sequences'}=\@genes;
+		}
+	} else {
+		$func{$spe}->{$go_name}->{'TestSet_Sequences'}="";
+	}
+	return %func;
+}
+
+sub read_ano {
+	open ANOTATION, "$ano" or die "there is no $ano\n"; # the fisrt column should be the same id underlying the function in enrichment file, and sep as tab
+	while (<ANOTATION>) {
+		chomp;
+		my $info;
+		my @a=split /\t/;
+		my $gene_id=$a[$gene_column-1];
+		for (my $i = 0; $i < @a; $i++) {
+			unless ($i==$gene_column-1) {
+				$info.=$a[$i]."\t";
+			}
+		}
+		$info=~s/\s+$//;
+		$ano{$gene_id}=$info;
+	}
+	return %ano;
+}
