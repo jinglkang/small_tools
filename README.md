@@ -1,10 +1,11 @@
-Tools that may be useful 
 ===============  
 #######################
 ## 1. extract_gene_functions    
 #######################
 ### run extract_gene_functions  
+Example: 
 extract_gene_functions -i Enrichment/\*\_enrichment.txt -a Orthogroup-uniprot.gene.name --gene_column 1 --func_column 3 --functions functions_txt/pH_functions.txt --output 1
+
 will print the overal functional enrichment results of all \*\_enrichment.txt provided,
 and all genes of these files underlying the functions provided by functions_txt/pH_functions.txt (the target functions).  
 
