@@ -2,6 +2,7 @@
 ## 1. extract_gene_functions    
 #######################
 ### run extract_gene_functions  
+chmod +x extract_gene_functions
 Example: 
 extract_gene_functions -i Enrichment/\*\_enrichment.txt -a Orthogroup-uniprot.gene.name --gene_column 1 --func_column 3 --functions functions_txt/pH_functions.txt --output 1
 
