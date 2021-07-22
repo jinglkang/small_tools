@@ -21,7 +21,16 @@ or
 \_\___粗体文本__\_\_  
 \*\*\****粗斜体文本***\*\*\*  
 \_\_\____粗斜体文本___\_\_\_  
-<font color=FF0000> text </font>    
+```diff
+- text in red
++ text in green
+! text in orange
+# text in gray
+@@ text in purple (and bold)@@
+```
+- ![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) `#f03c15`
+- ![#c5f015](https://via.placeholder.com/15/c5f015/000000?text=+) `#c5f015`
+- ![#1589F0](https://via.placeholder.com/15/1589F0/000000?text=+) `#1589F0`
 ***
 ## 分隔线
 \*\*\*:分隔线1，整个行只能有三个或三个以上*  
