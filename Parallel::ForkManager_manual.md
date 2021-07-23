@@ -35,3 +35,17 @@ $manager->run_on_start(
 ```
 **The arguments passed to the run_on_start sub are the process id of the forked process (provided by the operating system) and an identifier for the process that can be defined in the start method of the Parallel::ForkManager process.**  
 **You should remember this in case that you don't provide an identifier in the call to start, this will make $ident be undefined and cause the Perl interpreter to complain (if you are using strict and warnings).**  
+```perl
+$manager->run_on_finish( 
+	sub {
+		my ( $pid, $exit_code, $ident, $signal, $core ) = @_;
+        if ( $core ) {
+        	print "Process $ident (pid: $pid) core dumped.\n";
+        } else {
+        	print "Process $ident (pid: $pid) exited 
+            print "with code $exit_code and signal $signal.\n";
+        }
+    }
+);
+```
+This callback prints useful messages upon completion of the process. One caveat is that $ident must be defined in the start method of each process for this to work, otherwise this code needs to be modified.  
