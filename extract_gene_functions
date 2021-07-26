@@ -8,7 +8,7 @@ my $usage=<<_EOH_;;
 ----------------------------------------------
 This script is used to extract genes underlying the GO functional enrichment results from many files (or species)
 
-Usage: $0 --input *enrichment.txt
+Usage: $0 -i Enrichment/*_enrichment.txt -a Orthogroup-uniprot.gene.name --gene_column 1 --func_column 3 --functions functions_txt/pH_functions.txt --output 1  
 The input name should have a pattern like "<species>_<enrichment>.txt" such as Apoly_enrichment.txt, and also separated as tabs
 
 Options:
