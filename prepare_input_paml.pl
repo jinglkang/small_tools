@@ -84,6 +84,7 @@ open INPUT, "$input" or die "can not open $input\n";
 while (<INPUT>) {
 	chomp;
 	my @a=split;
+	my $orth_id=$a[0];
 	for (my $i = 0; $i < @a; $i++) {
 		if ($i==0) {
 			mkdir "$output/$a[0]" unless (-e "$output/$a[0]");
@@ -121,22 +122,48 @@ while (<INPUT>) {
     `Gblocks multiple_sequence.out.mod -t=c`; # output "multiple_sequence.out.mod-gb"
     open FIL2, "multiple_sequence.out.mod-gb" or die "can not open multiple_sequence.out.mod-gb\n";
     open FIL3, ">multiple_sequence.out.mod-gb-1" or die "can not create multiple_sequence.out.mod-gb-1\n";
-    my $SPE; my %hash;
+    open FIL4, ">final_alignment.fa" or die "can not create multiple_sequence.out.mod-gb-1\n";
+    my $SPE; my (%hash1, %hash2);
     while (<FIL2>) {
     	chomp;
     	if (/>/) {
     		s/>//; $SPE=$_;
     	} else {
-    		s/\s+//g; $hash{$SPE}.=$_;
+    		s/\s+//g; s/\d/-/g;
+    		$hash1{$SPE}.=$_;
     	}
     }
     my $i=0;
     foreach my $spe (@spe) {
+    	my $seq=$hash1{$spe};
+    	for (my $i = 0; $i < length($seq); $i+=3) {
+    		my $codon=substr($seq,$i,3);
+    		if ($codon=~/taa/i||$codon=~/tga/i||$codon=~/tag/i) {
+    			$codon="---"; # replace stop codon to gap
+    		}
+    		$hash2{$spe}.=$codon;
+    	}
     	$i++; if ($i==1) {
-    		my $num=@spe; my $len=length($hash{$spe});
+    		my $num=@spe; my $len=length($hash2{$spe});
     		print FIL3 "$num $len\n";
+    		print FIL3 "$spe $hash2{$spe}\n";
+    		print FIL4 ">$spe\n$hash2{$spe}\n";
     	} else {
-    		print FIL3 "$spe $hash{$spe}\n";
+    		print FIL3 "$spe $hash2{$spe}\n";
+    		print FIL4 ">$spe\n$hash2{$spe}\n";
+    	}
+    }
+    # check gaps in the sequences
+    open FIL3, "multiple_sequence.out.mod-gb-1";
+    open FIL5, ">>$pwd/final_orth_input_paml.txt";
+    my $j=-1;
+    while (<FIL3>) {
+    	chomp;
+    	my @a=split; $j++;
+    	if ($a[1]=~/n|-/i) {
+    		last;
+    	} elsif ($j==@spe) {
+    		print FIL5 "$orth_id\n";
     	}
     }
     `mv multiple_sequence.out.mod-gb-1 final_alignment.phy`;
