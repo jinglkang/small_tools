@@ -129,7 +129,7 @@ while (<INPUT>) {
     	if (/>/) {
     		s/>//; $SPE=$_;
     	} else {
-    		s/\s+//g; s/\d/-/g;
+    		s/ //g; s/\d/-/g;
     		$hash1{$SPE}.=$_;
     	}
     }
@@ -145,11 +145,11 @@ while (<INPUT>) {
     	}
     	$i++; if ($i==1) {
     		my $num=@spe; my $len=length($hash2{$spe});
-    		print FIL3 "$num $len\n";
-    		print FIL3 "$spe $hash2{$spe}\n";
+    		print FIL3 "$num  $len\n";
+    		print FIL3 "$spe  $hash2{$spe}\n";
     		print FIL4 ">$spe\n$hash2{$spe}\n";
     	} else {
-    		print FIL3 "$spe $hash2{$spe}\n";
+    		print FIL3 "$spe  $hash2{$spe}\n";
     		print FIL4 ">$spe\n$hash2{$spe}\n";
     	}
     }
@@ -162,7 +162,8 @@ while (<INPUT>) {
     	my @a=split; $j++;
     	if ($a[1]=~/n|-/i) {
     		last;
-    	} elsif ($j==@spe) {
+    	}
+    	if ($j==@spe) {
     		print FIL5 "$orth_id\n";
     	}
     }
