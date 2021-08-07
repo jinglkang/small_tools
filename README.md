@@ -78,12 +78,14 @@ perl codeml.pl --input final_orth_input_paml.txt --model free-ratio --dir . --tr
 
 **Example**:  
 1. --input:  
+```
 OG0000035  
 OG0000047  
 OG0000055  
 OG0000059  
 OG0000063  
 OG0000083  
+```
 
 2. --model:  
 ```
