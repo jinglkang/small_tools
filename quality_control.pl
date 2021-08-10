@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Getopt::Long 'HelpMessage';
+use File::Path qw( make_path );
+use File::Basename;
 
 my $usage=<<_EOH_;;
 ------------------------------------------------------------------------------------
@@ -48,27 +50,29 @@ while (<INPUT>) {
 	chomp;
 	my @a=split;
 	`mv $a[0] $a[1]`;
-	`fastqc $a[1] -o $fastqc1 -t 32`;
+	`fastqc $a[1] -o $fastqc1 --extract -t 32`;
 }
 chdir $pwd;
 
 &over_seq();
 
+die "Overrep_seq.txt is null" if -z "Overrep_seq.txt";
+
 # Trimmomatic
 my $adaptor="$trim_dir/adapters/TruSeq2-PE.fa";
 `cat $adaptor Overrep_seq.txt >$pwd/TruSeq2-PE-final.fa`;
-mkdir "Trimmomatic/paired/" unless -d "Trimmomatic/paired/";
-mkdir "Trimmomatic/unpaired/" unless -d "Trimmomatic/unpaired/";
+make_path("Trimmomatic/paired/") unless -d "Trimmomatic/paired/";
+make_path("Trimmomatic/unpaired/") unless -d "Trimmomatic/unpaired/";
 my @fq_R1=<$raw_dir/*_R1.fq.gz>;
 foreach my $R1 (@fq_R1) {
-	my ($name)=$R1=~/(.*)\_R1\.fq\.gz/;
+	my ($name)=basename($R1)=~/(.*)\_R1\.fq\.gz/;
 	my $R2=$name."_R2.fq.gz";
 	my $R1_clean=$name."_R1.clean.fq.gz";
 	my $R2_clean=$name."_R2.clean.fq.gz";
 	my $R1_unpaired=$name."_R1.unpaired.fq.gz";
 	my $R2_unpaired=$name."_R2.unpaired.fq.gz";
 	my $cmd="java -jar $trim_dir/trimmomatic-0.39.jar ";
-	$cmd.="PE $R1 $R2 ";
+	$cmd.="PE $R1 $raw_dir/$R2 ";
 	$cmd.="Trimmomatic/paired/$R1_clean Trimmomatic/unpaired/$R1_unpaired ";
 	$cmd.="Trimmomatic/paired/$R2_clean Trimmomatic/unpaired/$R2_unpaired ";
 	$cmd.="ILLUMINACLIP:$pwd/TruSeq2-PE-final.fa:2:30:10 LEADING:4 ";
@@ -81,7 +85,7 @@ my $fastqc2=$pwd."/fastqc2";
 mkdir $fastqc2 unless -d $fastqc2;
 my @fq_clean=<Trimmomatic/paired/*.fq.gz>;
 foreach my $fq (@fq_clean) {
-	`fastqc $fq -o $fastqc2 -t 32`;
+	`fastqc $fq -o $fastqc2 --extract -t 32`;
 }
 
 # multiqc
@@ -111,7 +115,9 @@ sub over_seq {
 			}
 		}
 	}
+	my $i;
 	foreach my $key (keys %hash) {
-		print REP "$key\n";
+		$i++;
+		print REP ">Overrep_$i\n$key\n";
 	}
 }
