@@ -1,0 +1,147 @@
+use strict;
+use warnings;
+use Getopt::Long 'HelpMessage';
+
+my $usage=<<_EOH_;;
+----------------------------------------------------------------------------------------
+This script is used to extract reads number from an overall reads number matrix
+Usage: 
+# ~/Documents/2021/White_island/reads_number_matrix
+perl extract_reads_nb.pl --matrix all_species_matrix.xls --genes zona_related_genes.txt --samples 1.txt
+perl extract_reads_nb.pl --matrix all_species_matrix.xls --samples 1.txt|head >2.txt
+
+Example:
+1. --matrix: the overall reads number matrix
+
+2. --genes: zona_related_genes.txt;
+OG0015450	sp|P79762|ZP3_CHICK	Zona pellucida sperm-binding protein 3
+OG0018177	sp|Q12836|ZP4_HUMAN	Zona pellucida sperm-binding protein 4
+OG0023058	sp|Q9BH10|ZP2_BOVIN	Zona pellucida sperm-binding protein 2
+
+3. --samples: coldata.txt; # has header
+	Site_1	Site_2	Species
+B6	Cs	Control	Common
+B7	Cs	Control	Common
+B8	Cs	Control	Common
+B9	Cs	Control	Common
+
+																			Kang 2021-8-17
+------------------------------------------------------------------------------------------
+_EOH_
+;
+
+GetOptions(
+	'matrix:s', \my $table,	# the overall reads number matrix
+	'genes:s', \ my $gene_file,	# the file including genes: one gene per line, the gene must be in the first column
+	'samples:s', \ my $sample_file,	# the sample including samples: one sample per line, the sample must be in the first column
+	'help', \ my $help
+	);
+
+if ($help || (! $gene_file) && (! $sample_file) || (!$table)) {
+	die $usage; # all of these options are mandatory requirements
+}
+
+my ($all_inds, $all_genes, $hash_nb)=&hash_reads_nb("$table");
+
+if ($gene_file && $sample_file) {
+	my ($blank, $genes, $hash_gene_info)=&read_gene_file;
+	my @samples=&read_sample_file;
+	&print_reads_nb($blank, $genes, \@samples, $hash_nb, $hash_gene_info);
+}
+
+if ($gene_file && !$sample_file) {
+	my ($blank, $genes, $hash_gene_info)=&read_gene_file;
+	&print_reads_nb($blank, $genes, $all_inds, $hash_nb, $hash_gene_info);
+}
+
+if (!$gene_file && $sample_file) {
+	my $blank="\t";
+	my @samples=&read_sample_file;
+	&print_reads_nb($blank, $all_genes, \@samples, $hash_nb);
+}
+
+#####################################################
+sub hash_reads_nb {
+	my ($table)=@_;
+	open TAB, "$table" or die "can not open $table\n";
+	my (@header, @genes);
+	my %hash;
+	while (<TAB>) {
+		chomp;
+		my @a=split;
+		if (/^\s+/) {
+			@header=split;
+		} else {
+			my $name=$a[0];
+			push @genes, $name;
+			for (my $i = 1; $i < @a; $i++) {
+				$hash{$name}->{$header[$i-1]}=$a[$i];
+			}
+		}
+	}
+	return (\@header, \@genes, \%hash);
+}
+
+sub read_gene_file {
+	my @genes;
+	my ($i, $blank);
+	my %hash;
+	open ORTH, "$gene_file" or die "can not open $gene_file\n";
+	while (<ORTH>) {
+		chomp;
+		$i++;
+		my @a=split /\t/;
+		my $gene=$a[0];
+		my $info;
+		for (my $j = 0; $j < @a; $j++) {
+			$info.=$a[$j]."\t";
+		}
+		$info=~s/\s+$//;
+		$hash{$gene}=$info;
+		push @genes, $gene;
+		if ($i==1) {
+			for (my $j = 0; $j < @a; $j++) {
+				$blank.="\t";
+			}
+		}
+#		print "${$hash}{$name}\n";
+	}
+	return ($blank, \@genes, \%hash);
+}
+
+sub read_sample_file {
+	my $k;
+	my @samples;
+	open SAM, "$sample_file" or die "can not open $sample_file\n"; # this file has header as the default
+	while (<SAM>) {
+		chomp;
+		$k++;
+		if ($k==1) {
+			next;
+		} else {
+			my @a=split /\t/;
+			push @samples, $a[0];
+		}
+	}
+	return(@samples);
+}
+
+sub print_reads_nb {
+	my ($blank, $gene, $sample, $hash, $hash_gene_info)=@_;
+	my $header=$blank;
+	foreach my $sample_id (@{$sample}) {
+		$header.=$sample_id."\t";
+	}
+	$header=~s/\s+$//;
+	print "$header\n";
+	foreach my $gene_id (@{$gene}) {
+		my $info=(${$hash_gene_info}{$gene_id})?(${$hash_gene_info}{$gene_id}):($gene_id);
+		$info.="\t";
+		foreach my $sample_id (@{$sample}) {
+			my $info1=${$hash}{$gene_id}->{$sample_id};
+			$info.=$info1."\t";
+		}
+		$info=~s/\s+$//;
+		print "$info\n";
+	}
+}
