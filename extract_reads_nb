@@ -7,8 +7,8 @@ my $usage=<<_EOH_;;
 This script is used to extract reads number from an overall reads number matrix
 Usage: 
 # ~/Documents/2021/White_island/reads_number_matrix
-perl extract_reads_nb.pl --matrix all_species_matrix.xls --genes zona_related_genes.txt --samples 1.txt
-perl extract_reads_nb.pl --matrix all_species_matrix.xls --samples 1.txt|head >2.txt
+extract_reads_nb --matrix all_species_matrix.xls --genes zona_related_genes.txt --samples 1.txt
+extract_reads_nb --matrix all_species_matrix.xls --samples 1.txt|head >2.txt
 
 Example:
 1. --matrix: the overall reads number matrix
