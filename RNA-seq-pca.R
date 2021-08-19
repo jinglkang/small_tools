@@ -1,4 +1,6 @@
 # This my first R script, and this script still has many limitations
+# Usage: Rscript pca.R total_Blenny.gene.matrix coldata_Blenny.txt aa
+# the parameters should be in order (read_nb matrix; sample information table; the name of output pdf)
 
 #!/usr/bin/env Rscript
 library(DESeq2)
