@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long 'HelpMessage';
+use List::MoreUtils qw(firstidx);
+
+my $usage=<<_EOH_;;
+------------------------------------------------------------------------------------------
+This script is used to output the PCA plot from a reads number matrix
+print command to a Rscript and then run it to output the plot
+
+Usage: 
+pca_rna --matrix Blenny_read_nb.xls --samples coldata_Blenny.txt --title Blenny --column Site_2
+
+Example:
+1. --matrix: Blenny_read_nb.xls
+
+	B61	B62	B63	B64	B65	B66	B67	B68	B69	B71	B72	B73	B74	B75	B76	B77	B78	B79
+OG0038649	430	218	222	486	402	612	266	159	278	334	365	190	614	464	346	543	477	490
+OG0039547	0	1	0	0	0	0	0	0	0	0	0	3	0	0	0	0	0	0
+
+2. --samples: coldata_Blenny.txt
+
+	Site_1	Site_2	Species
+B61	Vn	Vent	Blenny
+B62	Vn	Vent	Blenny
+
+																			Kang 2021-8-20
+------------------------------------------------------------------------------------------
+_EOH_
+;
+
+
+GetOptions(
+	'matrix:s', \my $matrix,	# the overall reads number matrix
+	'samples:s', \ my $sample_file,	# the sample information
+	'column:s', \my $col, # the column selected from the sample information
+	'title:s', \my $title, # the title
+	'help', \ my $help
+	);
+
+if ($help || (! $matrix) && (! $sample_file) || (!$col) || (!$title)) {
+	die $usage; # all of these options are mandatory requirements
+}
+
+main: {
+	&creat_R_script();
+	exit(0);
+}
+
+###################################################################################
+sub creat_R_script {
+	my $output=$title.".pdf";
+	open MATRIX, "$matrix" or die "can not open $matrix\n";
+	chomp(my $header = <MATRIX>);
+	close MATRIX;
+	my @a=split /\s+/, $header;
+	my $ind_nb=@a;
+	my $least_nb=$ind_nb*10;
+	open PCA, ">pca.R" or die "can not creat pca.R\n";
+	print PCA "library(DESeq2)\n";
+	print PCA "library(ggplot2)\n";
+	print PCA "cts <- read.table(file=\"$matrix\",header=TRUE,row.names = 1)\n";
+	print PCA "coldata <- read.table(file=\"$sample_file\")\n";
+	my $dds="dds <- DESeqDataSetFromMatrix(countData = cts,";
+	$dds.="colData = coldata,design= ~$col)";
+	print PCA "$dds\n";
+	print PCA "keep <- rowSums(counts(dds)) >= $least_nb\n";
+	print PCA "dds <- dds[keep,]\ndds <- DESeq(dds)\nvsd <- vst(dds, blind=FALSE)\n";
+	print PCA "pcaData <- plotPCA(vsd, intgroup=c(\"$col\"), returnData=TRUE)\n";
+	print PCA "percentVar <- round(100 * attr(pcaData, \"percentVar\"))\n";
+	print PCA "pdf(file = \"$output\", width = 11.69, height = 8.27)\n";
+	my $ggplot2;
+	$title=~s/_/ /g;
+	$ggplot2="ggplot(pcaData, aes(PC1, PC2,color=$col)) + \n  ";
+	$ggplot2.="geom_point(size=6) +\n  ";
+	my $plot_basic=&basic_plot_attr();
+	$ggplot2.=$plot_basic;
+	$ggplot2.="xlab(paste0(\"PC1: \",percentVar[1],\"% variance\")) +\n  ylab(paste0(\"PC2: \",percentVar[2],\"% variance\")) +\n  ";
+	my $cols=&select_colour;
+	$ggplot2.="scale_color_manual(values=c($cols))";
+	print PCA "$ggplot2\n";
+	print PCA "dev.off()";
+	close PCA;
+	`R --no-save --no-restore --no-site-file --no-init-file -q < pca.R 1>&2`;
+	`rm pca.R`;
+}
+
+sub basic_plot_attr {
+	my $ggplot2="theme_bw() + ggtitle(\"$title\") +\n  ";
+	$ggplot2.="geom_text(aes(label=\"\"), hjust=1, vjust=2, show.legend = FALSE, family=\"Times\", colour=\"black\",size=4) +\n  ";
+	$ggplot2.="geom_text(aes(label=name, colour=$col), hjust=1, vjust=2, show.legend = FALSE, family=\"Times\", colour=\"black\",size=4) +\n  ";
+	$ggplot2.="theme(legend.position = \"right\", legend.title = element_blank(),\n  ";
+	$ggplot2.="panel.grid=element_blank(),axis.text.x=element_text(colour = \"black\", family=\"Times\",size=20),\n  ";
+	$ggplot2.="axis.text.y=element_text(family=\"Times\",size=20,colour = \"black\"),\n  ";
+	$ggplot2.="axis.title.x=element_text(family=\"Times\",size = 25,face=\"bold\"),\n  ";
+	$ggplot2.="axis.title.y=element_text(family=\"Times\",size = 25,face=\"bold\"),\n  ";
+	$ggplot2.="legend.text=element_text(face=\"bold\", family=\"Times\", colour=\"black\",size=18),\n  ";
+	$ggplot2.="plot.title=element_text(colour = \"black\", family=\"Times\",size=20, face=\"bold\", hjust = 0.5)) + \n  ";
+	$ggplot2.="xlab(paste0(\"PC1: \",percentVar[1],\"% variance\")) +\n  ylab(paste0(\"PC2: \",percentVar[2],\"% variance\")) +\n  ";
+	return($ggplot2);
+}
+
+sub select_colour {
+	my @colors=qw(DC0000FF F39B7F99 7E6148FF 00A087FF 4DBBD5FF 8491B4FF); # the maximum number of colour is 6
+	open SAMP, "$sample_file" or die "can not open $sample_file\n";
+	my $idx;
+	my @level;
+	my %hash;
+	while (<SAMP>) {
+		chomp;
+		my @a=split;
+		if (/^\s+/) {
+			$idx = firstidx { $_ eq $col } @a;
+		} else {
+			$hash{$a[$idx+1]}++;
+		}
+	}
+	my $level=keys %hash;
+	my $cols;
+	for (my $i = 0; $i < $level; $i++) {
+		$cols.="\'#$colors[$i]\',";
+	}
+	$cols=~s/\,$//;
+	return($cols);
+}
