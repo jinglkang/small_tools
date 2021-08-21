@@ -117,6 +117,8 @@ sub select_colour {
 	$fill=~s/\,\s+$//;
 	$legend=~s/\,\s+$//;
 	$total_ind=~s/\,\s+$//;
+	$total_branch_color.="set(\"leaves_pch\", c(19)) \%\>\% set(\"leaves_cex\", c(2)) \%>\%\n  ";
+	$total_branch_color.="set(\"leaves_col\", as.character(as.data.frame(labels_colors(dend))[,1])) \%\>\%\n  ";
 	$total_branch_color.="plot(main = \"$title hclust\")";
 	return($labels_colors, $total_branch_color, $legend, $fill, $total_ind);
 }
