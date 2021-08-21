@@ -10,7 +10,7 @@ This script is used to output the PCA plot from multiple reads number matrixs
 print command to a Rscript and then run it to output the plot
 
 Usage: 
-perl mhclust.pl --matrix Blenny_control_read_nb.xls Blue_eyed_control_read_nb.xls Common_control_read_nb.xls Yaldwyn_control_read_nb.xls \
+mhclust --matrix Blenny_control_read_nb.xls Blue_eyed_control_read_nb.xls Common_control_read_nb.xls Yaldwyn_control_read_nb.xls \
 --samples coldata_Blenny_control.txt coldata_Blue_eyed_control.txt coldata_Common_control.txt coldata_Yaldwyn_control.txt \
 --column Site_2 Site_1 Site_1 Site_2 \
 --title Blenny Blue_eyed Common Yaldwyn \
