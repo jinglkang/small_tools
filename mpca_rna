@@ -135,7 +135,7 @@ sub plot_arrange {
 	print PCA "dev.off()";
 	close PCA;
 	`R --no-save --no-restore --no-site-file --no-init-file -q < PCA.R 1>&2`;
-#	`rm PCA.R`;
+	`rm PCA.R`;
 	close PCA;
 }
 
