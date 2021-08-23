@@ -104,3 +104,118 @@ branch-site (branch-site-null, branch-site-alt);
 6. --tree:  
 
 7. --icode: **0 (the codons are universal) or mt. code (1)**  
+
+## 4. **mhclust**  
+This script is used to output the PCA plot from multiple reads number matrixs  
+print command to a Rscript and then run it to output the plot  
+
+### Usage:  
+```
+mhclust --matrix Blenny_control_read_nb.xls Blue_eyed_control_read_nb.xls Common_control_read_nb.xls Yaldwyn_control_read_nb.xls \
+--samples coldata_Blenny_control.txt coldata_Blue_eyed_control.txt coldata_Common_control.txt coldata_Yaldwyn_control.txt \
+--column Site_2 Site_1 Site_1 Site_2 \
+--title Blenny Blue_eyed Common Yaldwyn \
+--prefix total
+```
+
+**Example**:  
+1. --matrix: Blenny_read_nb.xls  
+```
+	B61	B62	B63	B64	B65	B66	B67	B68	B69	B71	B72	B73	B74	B75	B76	B77	B78	B79
+OG0038649	430	218	222	486	402	612	266	159	278	334	365	190	614	464	346	543	477	490
+OG0039547	0	1	0	0	0	0	0	0	0	0	0	3	0	0	0	0	0	0
+```
+
+2. --samples: coldata_Blenny.txt  
+```
+	Site_1	Site_2	Species
+B61	Vn	Vent	Blenny
+B62	Vn	Vent	Blenny
+```
+
+## 5. **mpca_rna**  
+This script is used to output the PCA plot from multiple reads number matrixs  
+print command to a Rscript and then run it to output the plot  
+
+### Usage:  
+```
+mpca_rna --matrix Blenny_control_read_nb.xls Blue_eyed_control_read_nb.xls Common_control_read_nb.xls Yaldwyn_control_read_nb.xls \
+--samples coldata_Blenny_control.txt coldata_Blue_eyed_control.txt coldata_Common_control.txt coldata_Yaldwyn_control.txt \
+--column Site_1 Site_1 Site_1 Site_1 \
+--title Blenny Blue_eyed Common Yaldwyn \
+--prefix total_pca
+```
+
+**Example**:
+1. --matrix: Blenny_read_nb.xls  
+```
+	B61	B62	B63	B64	B65	B66	B67	B68	B69	B71	B72	B73	B74	B75	B76	B77	B78	B79
+OG0038649	430	218	222	486	402	612	266	159	278	334	365	190	614	464	346	543	477	490
+OG0039547	0	1	0	0	0	0	0	0	0	0	0	3	0	0	0	0	0	0
+```
+
+2. --samples: coldata_Blenny.txt  
+```
+	Site_1	Site_2	Species
+B61	Vn	Vent	Blenny
+B62	Vn	Vent	Blenny
+```
+
+## 6. **extract_reads_nb**  
+This script is used to extract reads number from an overall reads number matrix  
+
+### Usage:  
+~/Documents/2021/White_island/reads_number_matrix  
+```
+extract_reads_nb --matrix all_species_matrix.xls --genes zona_related_genes.txt --samples 1.txt
+extract_reads_nb --matrix all_species_matrix.xls --samples 1.txt|head >2.txt
+```
+
+**Example**:
+1. --matrix: the overall reads number matrix  
+
+2. --genes: zona_related_genes.txt;  
+```
+OG0015450	sp|P79762|ZP3_CHICK	Zona pellucida sperm-binding protein 3
+OG0018177	sp|Q12836|ZP4_HUMAN	Zona pellucida sperm-binding protein 4
+OG0023058	sp|Q9BH10|ZP2_BOVIN	Zona pellucida sperm-binding protein 2
+```
+
+3. --samples: coldata.txt; # has header  
+```
+	Site_1	Site_2	Species
+B6	Cs	Control	Common
+B7	Cs	Control	Common
+B8	Cs	Control	Common
+B9	Cs	Control	Common
+```
+
+## 7. quality_control.pl  
+this script is used for the quality control of raw reads by fastqc and Trimmomatic  
+**MUST NOTICE** the kraken library  
+
+### Usage:  
+```bash
+perl quality_control.pl --input data_list.txt --raw_dir ./raw_data \
+--trim_dir ~/software/Trimmomatic-0.39 \
+--kraken_lib ~/software/kraken2/library \
+--fastqc ~/software/FastQC/fastqc
+```
+
+**Example: (SNORLAX)**  
+1. The fisrt time quality control  
+provide a list for the raw file including its path and the name after Trimmomatic  
+
+**Input**: (data_list.txt)
+```
+Original_name	Changed_name
+B71_S70_R1_001.fastq.gz	B71_R1.fq.gz
+B71_S70_R2_001.fastq.gz	B71_R2.fq.gz
+B72_S71_R1_001.fastq.gz	B72_R1.fq.gz
+B72_S71_R2_001.fastq.gz	B72_R2.fq.gz
+```
+
+**Directory of raw fastq files**: \$raw_dir  
+**Directory of Trimmomatic**: \$trim_dir  
+**Directory of kraken library**: \$kraken_lib:  
+**Directory of FastQC command**: \$fastqc  
