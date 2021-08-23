@@ -134,7 +134,7 @@ sub select_colour {
 	my $level_nb=keys %hash;
 	my $i=-1;
 	my ($labels_colors, $total_branch_color, $legend, $fill, $total_ind);
-	foreach my $level (keys %hash) {
+	foreach my $level (sort keys %hash) {
 		$i++;
 		$legend.="\"$level\"".", ";
 		my $branch_col;
