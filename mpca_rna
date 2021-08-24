@@ -136,7 +136,6 @@ sub plot_arrange {
 	close PCA;
 	`R --no-save --no-restore --no-site-file --no-init-file -q < pca.R 1>&2`;
 	`rm pca.R`;
-	close PCA;
 }
 
 sub basic_plot_attr {
