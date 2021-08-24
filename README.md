@@ -2,6 +2,13 @@
 1. extract_gene_functions
 2. prepare_input_paml.pl
 3. codeml.pl
+4. mhclust
+5. mpca_rna
+6. extract_reads_nb
+7. quality_control.pl
+8. mpca
+9. DESeq
+
 ## 1. extract_gene_functions    
 ### run extract_gene_functions  
 
@@ -16,29 +23,29 @@ and all genes of these files underlying the functions provided by functions_txt/
 ### usage:    
 Options:
 
-	--input,-i		your input enrichment files: could be many files (such as *_enrichment.txt) or a single file
-	--anotation,-a 		your anotation files to the genes under the functions file
-	--gene_column,-g 	which column is your gene_id in your anotation files
-	--func_column 		which column is your function name in your enrichment files
-	--functions 		your target functions need to be extracted
-	--output,-o 		the prefix of the output results
-	--help,-h 		Print this help
+    --input,-i      your input enrichment files: could be many files (such as *_enrichment.txt) or a single file
+    --anotation,-a      your anotation files to the genes under the functions file
+    --gene_column,-g    which column is your gene_id in your anotation files
+    --func_column       which column is your function name in your enrichment files
+    --functions         your target functions need to be extracted
+    --output,-o         the prefix of the output results
+    --help,-h       Print this help
 
 ## 2. prepare_input_paml.pl  
 
 This script is used to prepare the input for PAML  
 ### Usage:  
-	perl prepare_input_paml.pl --input ortho_list.txt --seq_dir . --cor_list correlation.txt --output .  
+    perl prepare_input_paml.pl --input ortho_list.txt --seq_dir . --cor_list correlation.txt --output .  
 
 **Example**:  
 1. --input:  
 the first column is the protein sequence id of reference, the other columns are the nucleotide sequences of each species  
 ```
-\# orth_id	reference_protein	spe1_nuc	spe2_nuc	spe3_nuc	spe4_nuc	spe5_nuc	spe6_nuc  
-OG0000014	sp|O62714|CASR_PIG	Apoly_6299	Padel_40993	Daru_99354	Acura_116661	Ocomp_39102	Pmol_166022  
-OG0000021	sp|Q9JHX4|CASP8_RAT	Apoly_3749	Padel_10792	Daru_24893	Acura_7918	Ocomp_30861	Pmol_46346  
-OG0000035	sp|O14936|CSKP_HUMAN	Apoly_14462	Padel_8374	Daru_143421	Acura_125242	Ocomp_155787	Pmol_97813  
-OG0000047	sp|P30568|GSTA_PLEPL	Apoly_17254	Padel_33286	Daru_13087	Acura_32119	Ocomp_171369	Pmol_47987  
+\# orth_id  reference_protein   spe1_nuc    spe2_nuc    spe3_nuc    spe4_nuc    spe5_nuc    spe6_nuc  
+OG0000014   sp|O62714|CASR_PIG  Apoly_6299  Padel_40993 Daru_99354  Acura_116661    Ocomp_39102 Pmol_166022  
+OG0000021   sp|Q9JHX4|CASP8_RAT Apoly_3749  Padel_10792 Daru_24893  Acura_7918  Ocomp_30861 Pmol_46346  
+OG0000035   sp|O14936|CSKP_HUMAN    Apoly_14462 Padel_8374  Daru_143421 Acura_125242    Ocomp_155787    Pmol_97813  
+OG0000047   sp|P30568|GSTA_PLEPL    Apoly_17254 Padel_33286 Daru_13087  Acura_32119 Ocomp_171369    Pmol_47987  
 ```
 
 2. --seq_dir: directory of sequences  
@@ -46,20 +53,20 @@ OG0000047	sp|P30568|GSTA_PLEPL	Apoly_17254	Padel_33286	Daru_13087	Acura_32119	Oc
 3. --cor_list:  
 Example table:
 ```
-refer 	reference_protein.fasta		# the first row of cor_list (the column 1 of input) are the id of reference protein sequences  
-spe1 	spe1.fasta					# the second row of cor_list (the column 2 of input) are the nucleotide sequences of spe1  
-spe2 	spe2.fasta					# the third row of cor_list (the column 3 of input) are the nucleotide sequences of spe2  
-... 	...							...
+refer   reference_protein.fasta     # the first row of cor_list (the column 1 of input) are the id of reference protein sequences  
+spe1    spe1.fasta                  # the second row of cor_list (the column 2 of input) are the nucleotide sequences of spe1  
+spe2    spe2.fasta                  # the third row of cor_list (the column 3 of input) are the nucleotide sequences of spe2  
+...     ...                         ...
 ```
 
 **Options**:  
 ```
-	--input			the list of orthologous genes, which should include the reference protein sequences id  
-					and the nucleotide sequences per species  
-	--seq_dir		the directory of nucleotide sequences and reference protein sequences  
-	--cor_list		the corresponding list between species and sequence fasta file  
-	--output,-o 	the directory of the output results  
-	--help,-h 		Print this help  
+    --input         the list of orthologous genes, which should include the reference protein sequences id  
+                    and the nucleotide sequences per species  
+    --seq_dir       the directory of nucleotide sequences and reference protein sequences  
+    --cor_list      the corresponding list between species and sequence fasta file  
+    --output,-o     the directory of the output results  
+    --help,-h       Print this help  
 ```
 
 ## 3. **codeml.pl**  
@@ -121,16 +128,16 @@ mhclust --matrix Blenny_control_read_nb.xls Blue_eyed_control_read_nb.xls Common
 **Example**:  
 1. --matrix: Blenny_read_nb.xls  
 ```
-	B61	B62	B63	B64	B65	B66	B67	B68	B69	B71	B72	B73	B74	B75	B76	B77	B78	B79
-OG0038649	430	218	222	486	402	612	266	159	278	334	365	190	614	464	346	543	477	490
-OG0039547	0	1	0	0	0	0	0	0	0	0	0	3	0	0	0	0	0	0
+    B61 B62 B63 B64 B65 B66 B67 B68 B69 B71 B72 B73 B74 B75 B76 B77 B78 B79
+OG0038649   430 218 222 486 402 612 266 159 278 334 365 190 614 464 346 543 477 490
+OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   0
 ```
 
 2. --samples: coldata_Blenny.txt  
 ```
-	Site_1	Site_2	Species
-B61	Vn	Vent	Blenny
-B62	Vn	Vent	Blenny
+    Site_1  Site_2  Species
+B61 Vn  Vent    Blenny
+B62 Vn  Vent    Blenny
 ```
 
 ## 5. **mpca_rna**  
@@ -149,16 +156,16 @@ mpca_rna --matrix Blenny_control_read_nb.xls Blue_eyed_control_read_nb.xls Commo
 **Example**:
 1. --matrix: Blenny_read_nb.xls  
 ```
-	B61	B62	B63	B64	B65	B66	B67	B68	B69	B71	B72	B73	B74	B75	B76	B77	B78	B79
-OG0038649	430	218	222	486	402	612	266	159	278	334	365	190	614	464	346	543	477	490
-OG0039547	0	1	0	0	0	0	0	0	0	0	0	3	0	0	0	0	0	0
+    B61 B62 B63 B64 B65 B66 B67 B68 B69 B71 B72 B73 B74 B75 B76 B77 B78 B79
+OG0038649   430 218 222 486 402 612 266 159 278 334 365 190 614 464 346 543 477 490
+OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   0
 ```
 
 2. --samples: coldata_Blenny.txt  
 ```
-	Site_1	Site_2	Species
-B61	Vn	Vent	Blenny
-B62	Vn	Vent	Blenny
+    Site_1  Site_2  Species
+B61 Vn  Vent    Blenny
+B62 Vn  Vent    Blenny
 ```
 
 ## 6. **extract_reads_nb**  
@@ -176,18 +183,18 @@ extract_reads_nb --matrix all_species_matrix.xls --samples 1.txt|head >2.txt
 
 2. --genes: zona_related_genes.txt;  
 ```
-OG0015450	sp|P79762|ZP3_CHICK	Zona pellucida sperm-binding protein 3
-OG0018177	sp|Q12836|ZP4_HUMAN	Zona pellucida sperm-binding protein 4
-OG0023058	sp|Q9BH10|ZP2_BOVIN	Zona pellucida sperm-binding protein 2
+OG0015450   sp|P79762|ZP3_CHICK Zona pellucida sperm-binding protein 3
+OG0018177   sp|Q12836|ZP4_HUMAN Zona pellucida sperm-binding protein 4
+OG0023058   sp|Q9BH10|ZP2_BOVIN Zona pellucida sperm-binding protein 2
 ```
 
 3. --samples: coldata.txt; # has header  
 ```
-	Site_1	Site_2	Species
-B6	Cs	Control	Common
-B7	Cs	Control	Common
-B8	Cs	Control	Common
-B9	Cs	Control	Common
+    Site_1  Site_2  Species
+B6  Cs  Control Common
+B7  Cs  Control Common
+B8  Cs  Control Common
+B9  Cs  Control Common
 ```
 
 ## 7. quality_control.pl  
@@ -208,11 +215,11 @@ provide a list for the raw file including its path and the name after Trimmomati
 
 **Input**: (data_list.txt)
 ```
-Original_name	Changed_name
-B71_S70_R1_001.fastq.gz	B71_R1.fq.gz
-B71_S70_R2_001.fastq.gz	B71_R2.fq.gz
-B72_S71_R1_001.fastq.gz	B72_R1.fq.gz
-B72_S71_R2_001.fastq.gz	B72_R2.fq.gz
+Original_name   Changed_name
+B71_S70_R1_001.fastq.gz B71_R1.fq.gz
+B71_S70_R2_001.fastq.gz B71_R2.fq.gz
+B72_S71_R1_001.fastq.gz B72_R1.fq.gz
+B72_S71_R2_001.fastq.gz B72_R2.fq.gz
 ```
 
 **Directory of raw fastq files**: \$raw_dir  
@@ -236,16 +243,44 @@ mpca --matrix Blenny_control_read_nb.xls Blue_eyed_control_read_nb.xls Common_co
 Example:
 1. --matrix: Blenny_read_nb.xls  
 ```
-	B61	B62	B63	B64	B65	B66	B67	B68	B69	B71	B72	B73	B74	B75	B76	B77	B78	B79
-OG0038649	430	218	222	486	402	612	266	159	278	334	365	190	614	464	346	543	477	490
-OG0039547	0	1	0	0	0	0	0	0	0	0	0	3	0	0	0	0	0	0
+    B61 B62 B63 B64 B65 B66 B67 B68 B69 B71 B72 B73 B74 B75 B76 B77 B78 B79
+OG0038649   430 218 222 486 402 612 266 159 278 334 365 190 614 464 346 543 477 490
+OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   0
 ```
 
 2. --samples: coldata_Blenny.txt  
 ```
-	Site_1	Site_2	Species
-B61	Vn	Vent	Blenny
-B62	Vn	Vent	Blenny
+    Site_1  Site_2  Species
+B61 Vn  Vent    Blenny
+B62 Vn  Vent    Blenny
 ```
 
 3. --label: use this parameter to whether have the label of the indviduals in the plot  
+
+## 9. **DESeq**  
+This script is used to DESeq2 results from multiple reads number matrixs based on all genes  
+save the DESeq2 result of all comparisons  
+print the DEGs number per comparison in the screen  
+
+**Usage**:  
+```bash
+DESeq --matrix Blenny_read_nb.xls \
+--samples coldata_Blenny.txt \
+--column Site_1 \
+--prefix Blenny
+```
+
+**Example**:
+1. --matrix: Blenny_read_nb.xls  
+```
+    B61 B62 B63 B64 B65 B66 B67 B68 B69 B71 B72 B73 B74 B75 B76 B77 B78 B79
+OG0038649   430 218 222 486 402 612 266 159 278 334 365 190 614 464 346 543 477 490
+OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   0
+```
+
+2. --samples: coldata_Blenny.txt  
+```
+    Site_1  Site_2  Species
+B61 Vn  Vent    Blenny
+B62 Vn  Vent    Blenny
+```
