@@ -134,8 +134,8 @@ sub plot_arrange {
 	print PCA "$ggarrange\n";
 	print PCA "dev.off()";
 	close PCA;
-	`R --no-save --no-restore --no-site-file --no-init-file -q < PCA.R 1>&2`;
-	`rm PCA.R`;
+	`R --no-save --no-restore --no-site-file --no-init-file -q < pca.R 1>&2`;
+	`rm pca.R`;
 	close PCA;
 }
 
