@@ -86,7 +86,8 @@ sub creat_R_common {
 	print PCA "coldata <- read.table(file=\"$sample_file\")\n";
 	print PCA "res.pca <- dudi.pca(data2, scannf = FALSE, nf = 5)\n";
 	print PCA "groups <- as.factor(coldata\$$col)\n";
-	my $para="res.pca, label=\"$label\", col.ind = groups, palette = \"Dark2\", ";
+	my $para;
+	$label?($para="res.pca, label=\"$label\", col.ind = groups, palette = \"Dark2\", "):($para="res.pca, abel=\"\",col.ind = groups, palette = \"Dark2\", ");
 	$para.="addEllipses = T, ellipse.type = \"confidence\",legend.title = \"\", ";
 	$para.="repel = TRUE, title = \"$title\"";
 	print PCA "$p<-fviz_pca_ind($para)\n";
