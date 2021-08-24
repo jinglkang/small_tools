@@ -219,3 +219,33 @@ B72_S71_R2_001.fastq.gz	B72_R2.fq.gz
 **Directory of Trimmomatic**: \$trim_dir  
 **Directory of kraken library**: \$kraken_lib:  
 **Directory of FastQC command**: \$fastqc  
+
+## 8. **mpca**  
+This script is used to output the PCA plot from multiple reads number matrixs based on all genes in your matrix  
+print command to a Rscript and then run it to output the plot  
+**Usage**:  
+```bash
+mpca --matrix Blenny_control_read_nb.xls Blue_eyed_control_read_nb.xls Common_control_read_nb.xls Yaldwyn_control_read_nb.xls \
+--samples coldata_Blenny_control.txt coldata_Blue_eyed_control.txt coldata_Common_control.txt coldata_Yaldwyn_control.txt \
+--column Site_1 Site_1 Site_1 Site_1 \
+--title Blenny Blue_eyed Common Yaldwyn \
+--label \
+--prefix total_pca_all_gene
+```
+
+Example:
+1. --matrix: Blenny_read_nb.xls  
+```
+	B61	B62	B63	B64	B65	B66	B67	B68	B69	B71	B72	B73	B74	B75	B76	B77	B78	B79
+OG0038649	430	218	222	486	402	612	266	159	278	334	365	190	614	464	346	543	477	490
+OG0039547	0	1	0	0	0	0	0	0	0	0	0	3	0	0	0	0	0	0
+```
+
+2. --samples: coldata_Blenny.txt  
+```
+	Site_1	Site_2	Species
+B61	Vn	Vent	Blenny
+B62	Vn	Vent	Blenny
+```
+
+3. --label: use this parameter to whether have the label of the indviduals in the plot  
