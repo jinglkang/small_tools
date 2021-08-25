@@ -1,13 +1,9 @@
 # The Manual
-1. extract_gene_functions
-2. prepare_input_paml.pl
-3. codeml.pl
-4. mhclust
-5. mpca_rna
-6. extract_reads_nb
-7. quality_control.pl
-8. mpca
-9. DESeq
+1. **extract_gene_functions**   2. **prepare_input_paml.pl**  
+3. **codeml.pl**                4. **mhclust**  
+5. **mpca_rna**                 6. **extract_reads_nb**  
+7. **quality_control.pl**       8. **mpca**  
+9. **DESeq**                    10. **RNAnorm**  
 
 ## 1. extract_gene_functions    
 ### run extract_gene_functions  
@@ -283,4 +279,44 @@ OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   
     Site_1  Site_2  Species
 B61 Vn  Vent    Blenny
 B62 Vn  Vent    Blenny
+```
+
+## 10. **RNAnorm**
+Used to extract raw TPM/FPKM/expected_count from the RSEM results, and also could do the normalization;  
+
+This script was revised from the script from two script in **Trinity** as follows:  
+############################  
+**abundance_estimates_to_matrix.pl** && **run_TMM_scale_matrix.pl**  
+can also use the two script to output the TPM-cross-sample-normalized matrix:  
+```bash
+~/software/trinityrnaseq-2.8.5/util/abundance_estimates_to_matrix.pl --est_method RSEM --gene_trans_map none --cross_sample_norm TMM  *.results
+```
+the target file: RSEM.isoform.TMM.EXPR.matrix
+
+
+############################
+This script do not consider the relationship between gene and transcript, will treat the  
+first column of \*.isoforms.results as an unit  
+
+### **Required**:  
+**--method**    Extract the Values from RSEM results; # expected_count, TPM, FPKM
+**--prefix**    the prefix of the result files
+
+### **option**:  
+**--norm**  
+1. cross-samples normalization to TPM values using TMM (trimmed mean of M-values) in edgeR;  
+2. square root normalization.  
+
+### **Usage**: my result pwd (/media/HDD/white_island/paired/RSEM_result)  
+```bash
+RNAnorm --method TPM --norm --prefix White_island *isoforms.results
+RNAnorm --method FPKM --prefix White_island *isoforms.results
+```
+**Example**:  
+Input: B10.isoforms.results (an output result file by RSEM)  
+```
+transcript_id   gene_id length  effective_length    expected_count  TPM FPKM    IsoPct
+OG0000007   OG0000007   5094    4788.76 3796.59 19.02   24.62   100.00
+OG0000012   OG0000012   339 58.13   3322.00 1371.18 1774.81 100.00
+OG0000019   OG0000019   1380    1074.76 340.00  7.59    9.82    100.00
 ```
