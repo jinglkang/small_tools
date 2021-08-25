@@ -21,13 +21,14 @@ This script do not consider the relationship between gene and transcript, will t
 first column of *.isoforms.results as an unit
 
 Required:
---method
-1. Extract the Values from RSEM results; # expected_count, TPM, FPKM
+*.isoforms.results: RSEM result files
+--method 	Extract the Values from RSEM results; # expected_count, TPM, FPKM
+--prefix 	the prefix of the result files
 
 option: 
 --norm
-2. cross-samples normalization to TPM values using TMM (trimmed mean of M-values) in edgeR; 
-3. square root normalization.
+1. cross-samples normalization to TPM values using TMM (trimmed mean of M-values) in edgeR; 
+2. square root normalization.
 
 Usage: my result pwd (/media/HDD/white_island/paired/RSEM_result)
 RNAnorm --method TPM --norm --prefix White_island *isoforms.results
