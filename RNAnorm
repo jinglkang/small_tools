@@ -1,0 +1,290 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Data::Dumper;
+use Getopt::Long 'HelpMessage';
+
+my $usage=<<_EOH_;;
+------------------------------------------------------------------------------------------
+Used to extract raw TPM/FPKM/expected_count from the RSEM results, and also could do the normalization;
+
+This script was revised from the script from two script in Trinity as follows:
+############################
+abundance_estimates_to_matrix.pl && run_TMM_scale_matrix.pl
+can also use the two script to output the TPM-cross-sample-normalized matrix:
+
+~/software/trinityrnaseq-2.8.5/util/abundance_estimates_to_matrix.pl --est_method RSEM --gene_trans_map none --cross_sample_norm TMM  *.results
+
+the target file: RSEM.isoform.TMM.EXPR.matrix
+############################
+This script do not consider the relationship between gene and transcript, will treat the
+first column of *.isoforms.results as an unit
+
+Required:
+--method
+1. Extract the Values from RSEM results; # expected_count, TPM, FPKM
+
+option: 
+--norm
+2. cross-samples normalization to TPM values using TMM (trimmed mean of M-values) in edgeR; 
+3. square root normalization.
+
+Usage: my result pwd (/media/HDD/white_island/paired/RSEM_result)
+RNAnorm --method TPM --norm --prefix White_island *isoforms.results
+RNAnorm --method FPKM --prefix White_island *isoforms.results
+
+Example:
+Input: B10.isoforms.results (an output result file by RSEM)
+
+transcript_id	gene_id	length	effective_length	expected_count	TPM	FPKM	IsoPct
+OG0000007	OG0000007	5094	4788.76	3796.59	19.02	24.62	100.00
+OG0000012	OG0000012	339	58.13	3322.00	1371.18	1774.81	100.00
+OG0000019	OG0000019	1380	1074.76	340.00	7.59	9.82	100.00
+
+																			Kang 2021-8-25
+------------------------------------------------------------------------------------------
+_EOH_
+;
+
+GetOptions(
+	'method:s', \my $method,	# the values were extracted from RSEM results file
+	'norm', \my $norm,
+	'prefix:s', \my $prefix,
+	'help', \ my $help
+	);
+
+unless ($method && $prefix && @ARGV) {
+	die $usage;
+}
+
+my @files = @ARGV;
+
+my ($acc_field, $counts_field, $fpkm_field, $tpm_field);
+$acc_field = 0;
+$counts_field = "expected_count";
+$fpkm_field = "FPKM";
+$tpm_field = "TPM";
+
+main: {
+	my %data;
+	my %sum_sample_counts;
+
+	foreach my $file (@files) {
+		print STDERR "-reading file: $file\n";
+		open (my $fh, $file) or die "Error, cannot open file $file";
+		my $header = <$fh>;
+		chomp $header;
+		my %fields = &parse_field_positions($header);
+		while (<$fh>) {
+			chomp;
+			my @x = split(/\t/);
+			my $acc = $x[ $fields{$acc_field} ];
+			my $count = $x[ $fields{$counts_field} ];
+			my $fpkm = $x[ $fields{$fpkm_field} ];
+			my $tpm = $x[ $fields{$tpm_field} ];
+
+			$data{$acc}->{$file}->{count} = $count;
+			$data{$acc}->{$file}->{FPKM} = $fpkm;
+			$data{$acc}->{$file}->{TPM} = $tpm;
+
+			# capture sample total counts
+			$sum_sample_counts{$file} += $count;
+		}
+		close $fh;
+	}
+
+	my %column_header_to_filename;
+	my @filenames = @files;
+	foreach my $file (@filenames) {
+		my $column_header=$file;
+		$column_header =~ s/\.(genes|isoforms)\.results$//;
+		$column_header_to_filename{$column_header} = $file;
+		$file = $column_header; # update the @filenames
+	}
+	print STDERR "\n\n* Outputting combined matrix.\n\n";
+
+	{ # check to see if they're unique
+		my %filename_map = map { + $_ => 1 } @filenames;
+		if (scalar keys %filename_map != scalar @filenames) {
+			die "Error, the column headings: @filenames are not unique\n";
+		}
+	}
+
+	my $counts_matrix_file = "$prefix.$method.raw.matrix";
+	open (my $ofh_counts, ">$counts_matrix_file") or die "Error, cannot write file $counts_matrix_file";
+	print $ofh_counts join("\t", "", @filenames) . "\n";
+	foreach my $acc (sort keys %data) {
+		print $ofh_counts "$acc";
+		foreach my $file (@files) {
+			my $count = $data{$acc}->{$file}->{$method};
+			unless (defined $count) {
+				$count = "NA";
+			}
+			print $ofh_counts "\t$count";
+		}
+		print $ofh_counts "\n";
+	}
+	close $ofh_counts;
+
+
+	if ($norm && ($method eq "TPM")) {
+		my ($TPM_matrix_file, $ofh_TPM );
+		$TPM_matrix_file = "$prefix.TPM.raw.matrix";
+		open ($ofh_TPM, "$TPM_matrix_file") or die "Error, need create $TPM_matrix_file first\n";
+		my $tmm_info_file = &run_TMM($TPM_matrix_file);
+		&write_normalized_file($TPM_matrix_file, $tmm_info_file);
+	}
+
+	exit(0);
+}
+
+###########################
+sub run_TMM {
+	my ($counts_matrix_file) = @_;
+	my $tmm_norm_script = "TPM_runTMM.R";
+	open (my $ofh, ">$tmm_norm_script") or die "Error, cannot write to $tmm_norm_script";
+
+	print $ofh "library(edgeR)\n\n";
+	print $ofh "rnaseqMatrix = read.table(\"$counts_matrix_file\", header=T, row.names=1, com='', check.names=F)\n";
+	print $ofh "rnaseqMatrix = as.matrix(rnaseqMatrix)\n";
+	print $ofh "rnaseqMatrix = round(rnaseqMatrix)\n";
+	print $ofh "exp_study = DGEList(counts=rnaseqMatrix, group=factor(colnames(rnaseqMatrix)))\n";
+	print $ofh "exp_study = calcNormFactors(exp_study)\n";
+	print $ofh "exp_study\$samples\$eff.lib.size = exp_study\$samples\$lib.size * exp_study\$samples\$norm.factors\n";
+	print $ofh "write.table(exp_study\$samples, file=\"TPM_TMM_info.txt\", quote=F, sep=\"\\t\", row.names=F)\n";
+
+	close $ofh;
+	&process_cmd("R --no-save --no-restore --no-site-file --no-init-file -q < $tmm_norm_script 1>&2 ");
+
+	my $tmm_matrix = "TPM_TMM_info.txt";
+
+	unless (-s $tmm_matrix) {
+		die "Error, TMM matrix $tmm_matrix was not generated.  Be sure edgeR is installed and see additional error messages above for other helpful info";
+	}
+	
+	return($tmm_matrix);
+}
+
+####
+sub write_normalized_file {
+	my ($matrix_file, $tmm_info_file) = @_;
+	my %col_to_eff_lib_size;
+	my %col_to_norm_factor;
+
+	my ($TPM_TMM, $TPM_TMM_sqrt);
+	$TPM_TMM="$prefix.TPM.TMM.matrix";
+	$TPM_TMM_sqrt="$prefix.TPM.TMM.sqrt.matrix";
+	open TPM_TMM, ">$TPM_TMM" or die "can not create $TPM_TMM\n";
+	open TPM_TMM_SQRT, ">$TPM_TMM_sqrt" or die "can not create $TPM_TMM_sqrt\n";
+
+	open (my $fh, $tmm_info_file) or die "Error, cannot open file $tmm_info_file";
+	my %bloom_to_col;
+
+	my $header = <$fh>;
+	while (<$fh>) {
+		chomp;
+		my @x = split(/\t/);
+		my ($col, $norm_factor, $eff_lib_size) = ($x[0], $x[2], $x[3]);
+		$col =~ s/\"//g;
+
+		my $bloom = $col;
+		$bloom =~ s/\W/$;/g;
+
+		$col_to_eff_lib_size{$col} = $eff_lib_size;
+		$col_to_norm_factor{$col} = $norm_factor;
+
+		if ($bloom ne $col) {
+			if (exists $bloom_to_col{$bloom}) {
+				die "Error, already stored $bloom_to_col{$bloom} for $bloom, but trying to also store $col here... Ensure column names are unique according to non-word characters.";
+			}
+
+			$col_to_eff_lib_size{$bloom} = $eff_lib_size;
+			$col_to_norm_factor{$bloom} = $norm_factor;
+		}
+	}
+	close $fh;
+
+	open ($fh, $matrix_file);
+	$header = <$fh>;
+	chomp $header;
+	my @pos_to_col = split(/\t/, $header);
+	my $check_column_ordering_flag = 0;
+
+	while (<$fh>) {
+		chomp;
+		my @x = split(/\t/);
+		unless ($check_column_ordering_flag) {
+			if (scalar(@x) == scalar(@pos_to_col) + 1) {
+				## header is offset, as is acceptable by R
+				## not acceptable here.  fix it:
+				unshift (@pos_to_col, "");
+			}
+			$check_column_ordering_flag = 1;
+			print TPM_TMM join("\t", @pos_to_col) . "\n";
+			print TPM_TMM_SQRT join("\t", @pos_to_col) . "\n";
+		}
+
+		my $gene = $x[0];
+		print TPM_TMM $gene;
+		print TPM_TMM_SQRT $gene;
+
+		for (my $i = 1; $i <= $#x; $i++) {
+			my $col = $pos_to_col[$i];
+			$col =~ s/\"//g;
+			my $adj_col = $col;
+			$adj_col =~ s/-/\./g;
+			my $bloom = $col;
+			$bloom =~ s/\W/$;/g;
+			my $eff_lib_size = $col_to_eff_lib_size{$col} 
+			|| $col_to_eff_lib_size{$bloom}
+			|| $col_to_eff_lib_size{$adj_col}
+			|| $col_to_eff_lib_size{"X$col"} 
+			|| die "Error, no eff lib size for [$col] or [$bloom] or [$adj_col] or [\"X$col\"]" . Dumper(\%col_to_eff_lib_size);
+			my $norm_factor = $col_to_norm_factor{$col}
+			|| $col_to_norm_factor{$bloom}
+			|| $col_to_norm_factor{$adj_col}
+			|| $col_to_norm_factor{"X$col"}
+			|| die "Error, no normalization scaling factor for $col" . Dumper(\%col_to_norm_factor);
+
+			my $read_count = $x[$i];
+			my $read_count1=$read_count * 1/$norm_factor;
+			my $read_count2=sqrt($read_count * 1/$norm_factor);
+			my $converted_val1 = sprintf("%.3f", $read_count1);
+			my $converted_val2 = sprintf("%.3f", $read_count2);
+
+			print TPM_TMM "\t$converted_val1";
+			print TPM_TMM_SQRT "\t$converted_val2";
+		}
+		print TPM_TMM "\n";
+		print TPM_TMM_SQRT "\n";
+	}
+	close TPM_TMM;
+	close TPM_TMM_SQRT;
+	return;
+
+}
+
+####
+sub process_cmd {
+	my ($cmd) = @_;
+
+	print STDERR $cmd;
+	my $ret = system($cmd);
+	if ($ret) {
+		die "Error, CMD: $cmd died with ret $ret";
+	}
+
+	return;
+}
+
+####
+sub parse_field_positions {
+	my ($header) = @_;
+	my %field_pos;
+	my @fields = split(/\s+/, $header);
+	for (my $i = 0; $i <= $#fields; $i++) {
+		$field_pos{$fields[$i]} = $i;
+		$field_pos{$i} = $i; # for fixed column assignment
+	}
+	return(%field_pos);
+}
