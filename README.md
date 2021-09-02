@@ -1,9 +1,15 @@
 # The Manual
-1. **extract_gene_functions**   2. **prepare_input_paml.pl**  
-3. **codeml.pl**                4. **mhclust**  
-5. **mpca_rna**                 6. **extract_reads_nb**  
-7. **quality_control.pl**       8. **mpca**  
-9. **DESeq**                    10. **RNAnorm**  
+1. **extract_gene_functions**   
+2. **prepare_input_paml.pl**  
+3. **codeml.pl**                
+4. **mhclust**  
+5. **mpca_rna**                 
+6. **extract_reads_nb**  
+7. **quality_control.pl**       
+8. **mpca**  
+9. **DESeq**                    
+10. **RNAnorm**  
+11. **ChangeHeader**  
 
 ## 1. extract_gene_functions    
 ### run extract_gene_functions  
@@ -319,4 +325,26 @@ transcript_id   gene_id length  effective_length    expected_count  TPM FPKM    
 OG0000007   OG0000007   5094    4788.76 3796.59 19.02   24.62   100.00
 OG0000012   OG0000012   339 58.13   3322.00 1371.18 1774.81 100.00
 OG0000019   OG0000019   1380    1074.76 340.00  7.59    9.82    100.00
+```
+
+## 11. **ChangeHeader**
+This script is used to change the header of your read nb matrix according to you command  
+
+### Usage: 
+ChangeHeader --raw all_species_raw_nb_matrix.xls --rename rename.txt > all_species_raw_nb_rename.matrix.xls  
+
+**Example**:
+1. --rename: rename.txt  
+```
+B36  Common_Cn_1
+B37  Common_Cn_2
+B38  Common_Cn_3
+B39  Common_Cn_4
+B40  Common_Cn_5
+```
+
+2. --raw: all_species_raw_nb_matrix.xls  
+```
+     B36  B37  B38  B39  B40  B6   B7   B8   B9   B10  B31  B32  B33  B34  B35  B1
+OG0038649 1974 3000 2376 2194 2773 2573 2427 2451 2573 2264 2374 2288 2152 2436 2120 2556
 ```
