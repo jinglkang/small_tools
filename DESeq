@@ -121,7 +121,7 @@ sub count_DEGs_nb {
 		my @a=split /\,/;
 		if (/NA/ || /baseMean/) {
 			next;
-		} elsif ($a[1]>=10 && $a[2]>=0.3 && $a[-1]<=0.05) {
+		} elsif ($a[1]>=10 && abs($a[2])>=0.3 && $a[-1]<=0.05) {
 			$i++;
 			print DEG "$a[0]\n";
 		}
