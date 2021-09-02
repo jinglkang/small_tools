@@ -1,11 +1,11 @@
 # The Manual
 1. **[extract_gene_functions](#extract_gene_functions)**   
-2. **[prepare_input_paml.pl](#prepare_input_paml\.pl)**  
-3. **[codeml.pl](#codeml\.pl)**                
+2. **[prepare_input_paml.pl](#prepare_input_paml)**  
+3. **[codeml.pl](#codeml)**                
 4. **[mhclust](#mhclust)**  
 5. **[mpca_rna](#mpca_rna)**                 
 6. **[extract_reads_nb](#extract_reads_nb)**  
-7. **[quality_control.pl](#quality_control\.pl)**       
+7. **[quality_control.pl](#quality_control)**       
 8. **[mpca](#mpca)**  
 9. **[DESeq](#DESeq)**                    
 10. **[RNAnorm](#RNAnorm)**  
@@ -33,7 +33,7 @@ Options:
     --output,-o         the prefix of the output results
     --help,-h       Print this help
 
-## prepare_input_paml\.pl
+## prepare_input_paml
 
 This script is used to prepare the input for PAML  
 ### Usage:  
@@ -71,7 +71,7 @@ spe2    spe2.fasta                  # the third row of cor_list (the column 3 of
     --help,-h       Print this help  
 ```
 
-## codeml\.pl
+## codeml
 This script is used to run codel per gene  
 
 ### Usage:  
