@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long 'HelpMessage';
+
+my $usage=<<_EOH_;;
+------------------------------------------------------------------------------------------
+This script is used to change the header of your read nb matrix according to you command
+Usage: 
+ChangeHeader --raw all_species_raw_nb_matrix.xls --rename rename.txt > all_species_raw_nb_rename.matrix.xls
+
+Example:
+1. --rename: rename.txt
+B36  Common_Cn_1
+B37  Common_Cn_2
+B38  Common_Cn_3
+B39  Common_Cn_4
+B40  Common_Cn_5
+
+2. --raw: all_species_raw_nb_matrix.xls
+     B36  B37  B38  B39  B40  B6   B7   B8   B9   B10  B31  B32  B33  B34  B35  B1
+OG0038649 1974 3000 2376 2194 2773 2573 2427 2451 2573 2264 2374 2288 2152 2436 2120 2556
+
+                                                                           Kang 2021-09-02
+------------------------------------------------------------------------------------------
+_EOH_
+;
+
+GetOptions(
+     'raw:s', \my $raw,  # the file whose header to be changed
+     'rename:s', \ my $rename,     # the file including the old name (first column) and new name (second column)
+     'help', \ my $help
+     );
+
+if ($help || (! $raw) && (! $rename) ) {
+     die $usage; # all of these options are mandatory requirements
+}
+
+my %hash=&build_hash_name($rename);
+my $i;
+open FIL, "$raw" or die "can not open $raw\n"; # the file whose header will be changed
+while (<FIL>) {
+     chomp;
+     $i++;
+     my @a=split /\t/;
+     if ($i==1) {
+          my $header;
+          for (my $j = 0; $j < @a; $j++) {
+               $a[$j]=~s/\s+//g;
+               my $name=$hash{$a[$j]}?$hash{$a[$j]}:$a[$j];
+               $header.=$name."\t";
+          }
+          $header=~s/\s+$//;
+          print "$header\n";
+     } else {
+          print "$_\n";
+     }
+}
+
+sub build_hash_name {
+     my ($file)=@_;
+     my %hash;
+     open FIL1, "$file" or die "can not open $file\n";
+     while (<FIL1>) {
+          chomp;
+          my @a=split /\t/;
+          my ($oldname, $newname)=($a[0], $a[1]);
+          $oldname=~s/\s+//g;
+          $newname=~s/\s+//g;
+          $hash{$oldname}=$newname;
+     }
+     return %hash;
+}
