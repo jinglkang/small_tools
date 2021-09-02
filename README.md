@@ -199,7 +199,7 @@ B8  Cs  Control Common
 B9  Cs  Control Common
 ```
 
-## quality_control.pl
+## quality_control
 this script is used for the quality control of raw reads by fastqc and Trimmomatic  
 **MUST NOTICE** the kraken library  
 
