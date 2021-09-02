@@ -1,15 +1,15 @@
 # The Manual
 1. **[extract_gene_functions](#extract_gene_functions)**   
-2. **prepare_input_paml.pl**  
-3. **codeml.pl**                
-4. **mhclust**  
-5. **mpca_rna**                 
-6. **extract_reads_nb**  
-7. **quality_control.pl**       
-8. **mpca**  
-9. **DESeq**                    
-10. **RNAnorm**  
-11. **ChangeHeader**  
+2. **[prepare_input_paml.pl](#prepare_input_paml.pl)**  
+3. **[codeml.pl](#codeml.pl)**                
+4. **[mhclust](#mhclust)**  
+5. **[mpca_rna](#mpca_rna)**                 
+6. **[extract_reads_nb](#extract_reads_nb)**  
+7. **[quality_control.pl](#quality_control.pl)**       
+8. **[mpca](#mpca)**  
+9. **[DESeq](#DESeq)**                    
+10. **[RNAnorm](#RNAnorm)**  
+11. **[ChangeHeader](#ChangeHeader)**  
 
 ## extract_gene_functions    
 ### run extract_gene_functions  
