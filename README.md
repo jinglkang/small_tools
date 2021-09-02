@@ -1,5 +1,5 @@
 # The Manual
-1. **[extract_gene_functions](##extract_gene_functions)**   
+1. **[extract_gene_functions](##1. extract_gene_functions)**   
 2. **prepare_input_paml.pl**  
 3. **codeml.pl**                
 4. **mhclust**  
