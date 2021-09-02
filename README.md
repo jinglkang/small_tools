@@ -11,7 +11,7 @@
 10. **RNAnorm**  
 11. **ChangeHeader**  
 
-## 1. extract_gene_functions    
+## extract_gene_functions    
 ### run extract_gene_functions  
 
 chmod +x extract_gene_functions   
