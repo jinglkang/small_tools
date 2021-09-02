@@ -33,7 +33,7 @@ Options:
     --output,-o         the prefix of the output results
     --help,-h       Print this help
 
-## prepare_input_paml.pl
+## prepare_input_paml\.pl
 
 This script is used to prepare the input for PAML  
 ### Usage:  
@@ -71,7 +71,7 @@ spe2    spe2.fasta                  # the third row of cor_list (the column 3 of
     --help,-h       Print this help  
 ```
 
-## codeml.pl
+## codeml\.pl
 This script is used to run codel per gene  
 
 ### Usage:  
