@@ -65,6 +65,7 @@ my %hash1;
 open MATRIX, "$matrix" or die "can not open $matrix\n";
 while (<MATRIX>) {
 	chomp;
+	s/\s+$//;
 	$i++;
 	my @a=split /\t/;
 	foreach my $a (@a) {
@@ -79,11 +80,12 @@ while (<MATRIX>) {
 	}
 }
 
-my ($k, $idx1, $idx2);
-my %hash2;
+my ($k, $idx1, $idx2, $header1);
+my (%hash2, %hash3);
 open SAMPLE, "$sample" or die "can not open $sample\n";
 while (<SAMPLE>) {
 	chomp;
+	s/\s+$//g;
 	$k++;
 	my @a=split /\t/;
 	foreach my $a (@a) {
@@ -92,12 +94,26 @@ while (<SAMPLE>) {
 	if ($k==1) {
 			$idx1 = firstidx { $_ eq $col1 } @a;
 			$idx2 = firstidx { $_ eq $col2 } @a if $col2;
+			for (my $m = 1; $m < @a; $m++) {
+				unless ($m==$idx1 || $m==$idx2 || ($a[$m]=~/\s+/)) {
+					$header1.=$a[$m]."\t";
+				}
+			}
+			$header1=~s/\s+$//;
 		} else {
+			my $info;
 			push @{$hash2{$a[$idx1]}}, $a[0];
 			if ($col2) {
 				my $name=$a[$idx1]."-".$a[$idx2];
 				push @{$hash2{$name}}, $a[0];
 			}
+			for (my $m = 1; $m < @a; $m++) {
+				unless ($m==$idx1 || $m==$idx2 || ($a[$m]=~/\s+/)) {
+					$info.=$a[$m]."\t";
+				}
+			}
+			$info=~s/\s+$//;
+			$hash3{$a[0]}=$info;
 	}
 }
 
@@ -110,7 +126,7 @@ while (<GENE>) {
 }
 
 if ($col1 && ! $col2) {
-	print "Gene\tInd_old\tInd_new\tOrder1\tNb\n";
+	print "Gene\tInd_old\tInd_new\t$col1\tNb\t$header1\n";
 	foreach my $gene (@genes) {
 		my $i;
 		foreach my $order1 (@order1) {
@@ -118,14 +134,14 @@ if ($col1 && ! $col2) {
 			foreach my $ind (@{$hash2{$order1}}) {
 				my $name=$i."-".$ind;
 				my $nb=$hash1{$ind}->{$gene};
-				print "$gene\t$ind\t$name\t$order1\t$nb\n";
+				print "$gene\t$ind\t$name\t$order1\t$nb\t$hash3{$ind}\n";
 			}
 		}
 	}
 }
 
 if ($col1 && $col2) {
-	print "Gene\tInd_old\tInd_new\tOrder1\tOrder2\tNb\n";
+	print "Gene\tInd_old\tInd_new\t$col1\t$col2\tNb\t$header1\n";
 	foreach my $gene (@genes) {
 		my $i;
 		foreach my $order1 (@order1) {
@@ -137,7 +153,7 @@ if ($col1 && $col2) {
 				foreach my $ind (@{$hash2{$name}}) {
 					my $new_name=$i."-".$j."-".$ind;
 					my $nb=$hash1{$ind}->{$gene};
-					print "$gene\t$ind\t$new_name\t$order1\t$order2\t$nb\n";
+					print "$gene\t$ind\t$new_name\t$order1\t$order2\t$nb\t$hash3{$ind}\n";
 				}
 			}
 		}
