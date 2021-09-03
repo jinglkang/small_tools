@@ -12,7 +12,7 @@
 - **[ChangeHeader](#ChangeHeader)**  
 - **[Create extract_gene_expression_plot](#extract_gene_expression_plot)**  
 *********
-
+*********
 ## [extract_gene_functions](#The-Manual)    
 ### run extract_gene_functions  
 
@@ -34,7 +34,8 @@ Options:
     --functions         your target functions need to be extracted
     --output,-o         the prefix of the output results
     --help,-h       Print this help
-
+*********
+*********
 ## [prepare_input_paml](#The-Manual)
 
 This script is used to prepare the input for PAML  
@@ -73,6 +74,8 @@ spe2    spe2.fasta                  # the third row of cor_list (the column 3 of
     --help,-h       Print this help  
 ```
 
+*********
+*********
 ## [codeml](#The-Manual)
 This script is used to run codel per gene  
 
@@ -115,7 +118,8 @@ branch-site (branch-site-null, branch-site-alt);
 6. --tree:  
 
 7. --icode: **0 (the codons are universal) or mt. code (1)**  
-
+*********
+*********
 ## [mhclust](#The-Manual)
 This script is used to output the PCA plot from multiple reads number matrixs  
 print command to a Rscript and then run it to output the plot  
@@ -143,7 +147,8 @@ OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   
 B61 Vn  Vent    Blenny
 B62 Vn  Vent    Blenny
 ```
-
+*********
+*********
 ## [mpca_rna](#The-Manual)
 This script is used to output the PCA plot from multiple reads number matrixs  
 print command to a Rscript and then run it to output the plot  
@@ -171,7 +176,8 @@ OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   
 B61 Vn  Vent    Blenny
 B62 Vn  Vent    Blenny
 ```
-
+*********
+*********
 ## [extract_reads_nb](#The-Manual)
 This script is used to extract reads number from an overall reads number matrix  
 
@@ -200,7 +206,8 @@ B7  Cs  Control Common
 B8  Cs  Control Common
 B9  Cs  Control Common
 ```
-
+*********
+*********
 ## [quality_control](#The-Manual)
 this script is used for the quality control of raw reads by fastqc and Trimmomatic  
 **MUST NOTICE** the kraken library  
@@ -231,6 +238,8 @@ B72_S71_R2_001.fastq.gz B72_R2.fq.gz
 **Directory of kraken library**: \$kraken_lib:  
 **Directory of FastQC command**: \$fastqc  
 
+*********
+*********
 ## [mpca](#The-Manual)
 This script is used to output the PCA plot from multiple reads number matrixs based on all genes in your matrix  
 print command to a Rscript and then run it to output the plot  
@@ -260,7 +269,8 @@ B62 Vn  Vent    Blenny
 ```
 
 3. --label: use this parameter to whether have the label of the indviduals in the plot  
-
+*********
+*********
 ## [DESeq](#The-Manual)
 This script is used to DESeq2 results from multiple reads number matrixs based on all genes  
 save the DESeq2 result of all comparisons  
@@ -288,7 +298,8 @@ OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   
 B61 Vn  Vent    Blenny
 B62 Vn  Vent    Blenny
 ```
-
+*********
+*********
 ## [RNAnorm](#The-Manual)
 Used to extract raw TPM/FPKM/expected_count from the RSEM results, and also could do the normalization;  
 
@@ -329,6 +340,8 @@ OG0000012   OG0000012   339 58.13   3322.00 1371.18 1774.81 100.00
 OG0000019   OG0000019   1380    1074.76 340.00  7.59    9.82    100.00
 ```
 
+*********
+*********
 ## [ChangeHeader](#The-Manual)
 This script is used to change the header of your read nb matrix according to you command  
 
