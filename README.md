@@ -10,7 +10,7 @@
 - **[DESeq](#DESeq)**  
 - **[RNAnorm](#RNAnorm)**  
 - **[ChangeHeader](#ChangeHeader)**  
-- **[Create extract_gene_expression_plot](#extract_gene_expression_plot)**  
+- **[extract_gene_expression_plot](#extract_gene_expression_plot)**  
 *********
 *********
 ## [extract_gene_functions](#The-Manual)    
