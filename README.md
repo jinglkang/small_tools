@@ -20,7 +20,12 @@ chmod +x extract_gene_functions
 
 **Example**: 
 ```bash
-extract_gene_functions -i Enrichment/\*\_enrichment.txt -a Orthogroup-uniprot.gene.name --gene_column 1 --func_column 3 --functions functions_txt/pH_functions.txt --output 1
+extract_gene_functions -i Enrichment/\*\_enrichment.txt \
+-a Orthogroup-uniprot.gene.name \
+--gene_column 1 \
+--func_column 3 \
+--functions functions_txt/pH_functions.txt \
+--output 1
 ```
 
 will print the overal functional enrichment results of all \*\_enrichment.txt provided,
@@ -42,7 +47,13 @@ Options:
 
 This script is used to prepare the input for PAML  
 ### Usage:  
-    perl prepare_input_paml.pl --input ortho_list.txt --seq_dir . --cor_list correlation.txt --output .  
+```bash
+perl prepare_input_paml.pl \
+--input ortho_list.txt \
+--seq_dir . \
+--cor_list correlation.txt \
+--output .
+```
 
 **Example**:  
 1. --input:  
@@ -83,13 +94,23 @@ This script is used to run codel per gene
 
 ### Usage:  
 **branch model**  
-```
-perl codeml.pl --input final_orth_input_paml.txt --model branch --dir . --output_suf Apoly --tree PNG_species_Apoly.tre --icode 0 --omega 1.2  
+```bash
+perl codeml.pl --input final_orth_input_paml.txt \
+--model branch \
+--dir . \
+--output_suf Apoly \
+--tree PNG_species_Apoly.tre \
+--icode 0 \
+--omega 1.2  
 ```
 
 **free-ratio model**: notice the tree should not have the foreground marker in the phylogeny tree  
-```
-perl codeml.pl --input final_orth_input_paml.txt --model free-ratio --dir . --tree PNG_species.tre --icode 0 --omega 1.2  
+```bash
+perl codeml.pl --input final_orth_input_paml.txt \
+--model free-ratio \
+--dir . \
+--tree PNG_species.tre \
+--icode 0 --omega 1.2  
 ```
 
 **Example**:  
