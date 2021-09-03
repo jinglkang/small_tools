@@ -10,8 +10,10 @@
 - **[DESeq](#DESeq)**  
 - **[RNAnorm](#RNAnorm)**  
 - **[ChangeHeader](#ChangeHeader)**  
+- **[Create extract_gene_expression_plot](#extract_gene_expression_plot)**  
+*********
 
-## extract_gene_functions    
+## [extract_gene_functions](#The-Manual)    
 ### run extract_gene_functions  
 
 chmod +x extract_gene_functions   
@@ -348,3 +350,36 @@ B40  Common_Cn_5
      B36  B37  B38  B39  B40  B6   B7   B8   B9   B10  B31  B32  B33  B34  B35  B1
 OG0038649 1974 3000 2376 2194 2773 2573 2427 2451 2573 2264 2374 2288 2152 2436 2120 2556
 ```
+
+## extract_gene_expression_plot
+This script is used to print the data for expression pattern plot  
+
+**Usage**:  
+```bash
+extract_gene_expression_plot --matrix all_species_raw_nb_rename_ordered.matrix.xls \
+--sample coldata_rename_trait.txt \
+--gene gene.txt \
+--col1 Species --col2 Site_1 \
+--order1 Common Yaldwyn Blue_eyed Blenny \
+--order2 Cs Cn Vs Vn
+```
+
+**Input files**:
+1. --matrix all_species_raw_nb_rename_ordered.matrix.xls  
+```
+    B61 B62 B63 B64 B65 B66 B67 B68 B69 B71 B72 B73 B74 B75 B76 B77 B78 B79
+OG0038649   430 218 222 486 402 612 266 159 278 334 365 190 614 464 346 543 477 490
+OG0039547   0   1   0   0   0   0   0   0   0   0   0   3   0   0   0   0   0   0
+```
+
+2. --sample coldata_rename_trait.txt  
+```
+    Site_1  Site_2  Species Site_3  Date    pH_Meth pH_Mett Salinity    Sea_condition   Length  Gender
+Blenny_Cn_1 Cn  Control Blenny  Control 2019/1/15   NA  8.1 31.8    big_swell   6.2 Female
+Blenny_Cn_2 Cn  Control Blenny  Control 2019/1/15   NA  8.1 33.7    big_swell   4.8 Female
+Blenny_Cs_1 Cs  Control Blenny  Control 2019/1/15   NA  8.12    32.9    big_swell   4.2 NA
+```
+
+3. && 4. the column to be reordered in the samples file (coldata_rename_trait.txt)  
+5. Order in the first column  
+6. Order in the second column  
