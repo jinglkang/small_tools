@@ -48,7 +48,7 @@ if ($help || (! @matrix) && (! @sample_file) || (!@col) || (!@title) || (!$prefi
 }
 
 if ($label) {
-	$label="none";
+	$label="all";
 }
 
 main: {
