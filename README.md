@@ -388,6 +388,7 @@ B40  Common_Cn_5
 OG0038649 1974 3000 2376 2194 2773 2573 2427 2451 2573 2264 2374 2288 2152 2436 2120 2556
 ```
 ***
+***
 ## [extract_gene_expression_plot](#The-Manual)
 This script is used to print the data for expression pattern plot  
 
@@ -449,5 +450,6 @@ OG0000020	sp|O60284|ST18_HUMAN	Suppression of tumorigenicity 18 protein
 ```
 3. --col the column of annotation file (--anno unprot_name_description_orthgroup.txt) 
 		 that includes the elements in selected genes (--genes Blenny_Control_Vent.DEGs.txt)
+***
 ***
 
