@@ -11,6 +11,7 @@
 - **[RNAnorm](#RNAnorm)**  
 - **[ChangeHeader](#ChangeHeader)**  
 - **[extract_gene_expression_plot](#extract_gene_expression_plot)**  
+- **[extract_anno](#extract_anno)**  
 *********
 *********
 ## [extract_gene_functions](#The-Manual)    
@@ -386,7 +387,7 @@ B40  Common_Cn_5
      B36  B37  B38  B39  B40  B6   B7   B8   B9   B10  B31  B32  B33  B34  B35  B1
 OG0038649 1974 3000 2376 2194 2773 2573 2427 2451 2573 2264 2374 2288 2152 2436 2120 2556
 ```
-
+***
 ## [extract_gene_expression_plot](#The-Manual)
 This script is used to print the data for expression pattern plot  
 
@@ -419,3 +420,34 @@ Blenny_Cs_1 Cs  Control Blenny  Control 2019/1/15   NA  8.12    32.9    big_swel
 3. && 4. the column to be reordered in the samples file (coldata_rename_trait.txt)  
 5. Order in the first column  
 6. Order in the second column  
+***
+## [extract_anno](#The-Manual)
+This script is used to extract the annotation information of selected genes  
+**Usage**: 
+```
+extract_anno --genes Blenny_Control_Vent.DEGs.txt \
+--anno unprot_name_description_orthgroup.txt \
+--col col
+```
+**Input files**:
+
+1. --genes Blenny_Control_Vent.DEGs.txt
+```
+OG0004527
+OG0057108
+OG0058317
+OG0049323
+OG0031955
+```
+2. --anno unprot_name_description_orthgroup.txt (this file should be seperated by Tabular form)
+```
+Orth_id	Uni_id	Gene_des
+OG0000007	sp|Q9Y3S1|WNK2_HUMAN	Serine/threonine-protein kinase WNK2
+OG0000012	sp|P18729|ZG57_XENLA	Gastrula zinc finger protein XlCGF57.1 (Fragment)
+OG0000019	sp|P03360|POL_AVIRE	Gag-Pol polyprotein (Fragment)
+OG0000020	sp|O60284|ST18_HUMAN	Suppression of tumorigenicity 18 protein
+```
+3. --col the column of annotation file (--anno unprot_name_description_orthgroup.txt) 
+		 that includes the elements in selected genes (--genes Blenny_Control_Vent.DEGs.txt)
+***
+
