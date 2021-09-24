@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long 'HelpMessage';
+use List::MoreUtils qw(firstidx);
+
+my $usage=<<_EOH_;;
+------------------------------------------------------------------------------------------
+This script is used to extract the annotation information of selected genes
+
+Usage: 
+extract_anno --genes Blenny_Control_Vent.DEGs.txt \
+--anno unprot_name_description_orthgroup.txt \
+--col col
+
+Input files:
+
+1. --genes Blenny_Control_Vent.DEGs.txt
+
+OG0004527
+OG0057108
+OG0058317
+OG0049323
+OG0031955
+
+2. --anno unprot_name_description_orthgroup.txt (this file should be seperated by Tabular form)
+
+Orth_id	Uni_id	Gene_des
+OG0000007	sp|Q9Y3S1|WNK2_HUMAN	Serine/threonine-protein kinase WNK2
+OG0000012	sp|P18729|ZG57_XENLA	Gastrula zinc finger protein XlCGF57.1 (Fragment)
+OG0000019	sp|P03360|POL_AVIRE	Gag-Pol polyprotein (Fragment)
+OG0000020	sp|O60284|ST18_HUMAN	Suppression of tumorigenicity 18 protein
+
+3. --col the column of annotation file (--anno unprot_name_description_orthgroup.txt) 
+		 that includes the elements in selected genes (--genes Blenny_Control_Vent.DEGs.txt)
+
+
+
+											Kang 2021-09-24
+------------------------------------------------------------------------------------------
+_EOH_
+;
+
+GetOptions(
+	'genes:s', \my $gene,	# the file has genes (one id per line)
+	'anno:s', \ my $ann,	# the annotaion file
+	'col:i', \ my $col, # the column (should be number: 1, 2, 3 ...) of annotation including gene id in gene file
+	'help', \ my $help
+	);
+
+if ($help || (! $gene) || (! $ann) && (! $col)) {
+	die $usage; # all of these options are mandatory requirements
+}
+
+my %ano;
+open ANN, "$ann" or die "can not open $ann\n";
+while (<ANN>) {
+	chomp;
+	s/\r//g;
+	my @a=split /\t/;
+	my $info;
+	for (my $i = 0; $i < @a; $i++) {
+		$a[$i]=~s/^\s+//;
+		$a[$i]=~s/\s+$//;
+		unless ($i==$col-1) {
+			$info.=$a[$i]."\t";
+		}
+	}
+	$info=~s/\s+$//;
+	$ano{$a[$col-1]}=$info;
+}
+
+open GENE, "$gene" or die "can not open $gene\n";
+while (<GENE>) {
+	chomp;
+	s/\r//g;
+	s/^\s+//;
+	s/\s+$//;
+	print "$_\t$ano{$_}\n";
+}
