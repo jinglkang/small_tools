@@ -6,7 +6,7 @@ use List::MoreUtils qw(firstidx);
 
 my $usage=<<_EOH_;;
 ------------------------------------------------------------------------------------------
-This script is used to output the PCA plot from multiple reads number matrixs
+This script is used to output the hclust plot from multiple reads number matrixs
 print command to a Rscript and then run it to output the plot
 
 Usage: 
