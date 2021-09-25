@@ -428,7 +428,7 @@ This script is used to extract the annotation information of selected genes
 ```
 extract_anno --genes Blenny_Control_Vent.DEGs.txt \
 --anno unprot_name_description_orthgroup.txt \
---col col
+--col 1
 ```
 **Input files**:
 
