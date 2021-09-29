@@ -93,7 +93,7 @@ while (<SAMPLE>) {
 	}
 	if ($k==1) {
 			$idx1 = firstidx { $_ eq $col1 } @a;
-			$idx2 = firstidx { $_ eq $col2 } @a if $col2;
+			$col2?($idx2 = firstidx { $_ eq $col2 } @a):($idx2=-1); # if no $col2, set $idex=-1 to ensure no col is $col2
 			for (my $m = 1; $m < @a; $m++) {
 				unless ($m==$idx1 || $m==$idx2 || ($a[$m]=~/\s+/)) {
 					$header1.=$a[$m]."\t";
