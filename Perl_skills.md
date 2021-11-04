@@ -85,6 +85,7 @@ $.: 文件行数
 ## sort
 -n: comparing accoring to string numberic value     
 -r: reverse the result of comparisons   
+***
 ## perl函数：quotemeta
 return the values of EXPR with all the ASCII non-"word" characters backslashed (反斜杠\n).     
 quotemeta (and \Q ... \E) are useful when interpolating strings into regular expressions, because by default an interpolated variable will be considered a mini-regular expression. For example:       
