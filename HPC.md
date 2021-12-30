@@ -1,5 +1,4 @@
-# HPC2021
-passwd: dnpbjrvk21   
+# HPC2021  
 ## Login node 
 jlkang@hpc2021.hku.hk: Reserved for file editing, compilation and job submission/management   
 jlkang@hpc2021-io1.hku.hk && jlkang@hpc2021-io2.hku.hk: Reserved for file transfer, file management and data analysis/visualization   
