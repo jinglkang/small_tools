@@ -9,7 +9,6 @@ my $usage=<<_EOH_;;
 This script is used to prepare the input for PAML
 Usage: 
 perl prepare_input_paml.pl --input ortho_list.txt --seq_dir . --cor_list correlation.txt --output .
-
 Example:
 1. --input:
 the first column is the protein sequence id of reference, the other columns are the nucleotide sequences of each species
@@ -18,16 +17,13 @@ OG0000014	sp|O62714|CASR_PIG	Apoly_6299	Padel_40993	Daru_99354	Acura_116661	Ocom
 OG0000021	sp|Q9JHX4|CASP8_RAT	Apoly_3749	Padel_10792	Daru_24893	Acura_7918	Ocomp_30861	Pmol_46346
 OG0000035	sp|O14936|CSKP_HUMAN	Apoly_14462	Padel_8374	Daru_143421	Acura_125242	Ocomp_155787	Pmol_97813
 OG0000047	sp|P30568|GSTA_PLEPL	Apoly_17254	Padel_33286	Daru_13087	Acura_32119	Ocomp_171369	Pmol_47987
-
 2. --seq_dir:
 directory of sequences
-
 3. --cor_list:
 refer 	reference_protein.fasta		# the first row of cor_list (the column 1 of input) are the id of reference protein sequences
 spe1 	spe1.fasta					# the second row of cor_list (the column 2 of input) are the nucleotide sequences of spe1
 spe2 	spe2.fasta					# the third row of cor_list (the column 3 of input) are the nucleotide sequences of spe2
 ... 	...							...
-
 Options:
 	--input			the list of orthologous genes, which should include the reference protein sequences id
 					and the nucleotide sequences per species
@@ -119,7 +115,7 @@ while (<INPUT>) {
         }
     }
     `clustalo -i multiple_sequence.out.mod-1 -t DNA -o multiple_sequence.out.mod --outfmt=fa`;
-    `Gblocks multiple_sequence.out.mod -t=c`; # output "multiple_sequence.out.mod-gb"
+    `Gblocks multiple_sequence.out.mod -b4=10 -b5=n -b3=5 -t=c`; # output "multiple_sequence.out.mod-gb"
     open FIL2, "multiple_sequence.out.mod-gb" or die "can not open multiple_sequence.out.mod-gb\n";
     open FIL3, ">multiple_sequence.out.mod-gb-1" or die "can not create multiple_sequence.out.mod-gb-1\n";
     open FIL4, ">final_alignment.fa" or die "can not create multiple_sequence.out.mod-gb-1\n";
@@ -160,10 +156,11 @@ while (<INPUT>) {
     while (<FIL3>) {
     	chomp;
     	my @a=split; $j++;
+    	my $len=$a[1] if $j==1 && $a[1];
     	if ($a[1]=~/n|-/i) {
     		last;
     	}
-    	if ($j==@spe) {
+    	if ($j==@spe && $len && $len>=150) {
     		print FIL5 "$orth_id\n";
     	}
     }
