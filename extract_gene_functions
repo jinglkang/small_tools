@@ -75,7 +75,7 @@ main: {
 				my @genes=@{$func{$spe}->{$go_name}->{'TestSet_Sequences'}};
 				foreach my $gene (@genes) {
 					my $ano_gene=$ano{$gene};
-					print OUTPUT "$spe\t$go_name\t$ano_gene\n";
+					print OUTPUT "$spe\t$go_name\t$gene\t$ano_gene\n";
 				}
 			}
 		}
