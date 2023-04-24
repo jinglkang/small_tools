@@ -95,7 +95,10 @@ date
 sbatch script.cmd
 # Submitted batch job 112667
 # jlkang@hpc2021 Thu Dec 30 15:26:08 ~
-scancel 112667 # scancel <JobID>: cancel 
+scancel 112667 # scancel <JobID>: cancel
+# jlkang@hpc2021 Mon Apr 24 10:45:46 /lustre1/g/sbs_schunter/Kang/sea_urchin
+sbatch --test-only script1.cmd # Check the waiting time
+# sbatch: Job 1118951 to start at 2023-04-24T10:45:50 using 32 processors on nodes GPA-2-9 in partition amd
 ```
 **Check job status:**
 ```bash
