@@ -106,4 +106,22 @@ sbatch --test-only script1.cmd # Check the waiting time
 sq
 # JOBID  PARTITION  NAME         ST   USER       QOS      NODES CPUS  TRES_PER_NODE TIME_LIMIT  TIME_LEFT   NODELIST(REASON)
 # 112667 amd        jmodeltest   PD   jlkang     normal   1     1     N/A           1-10:00:00  1-10:00:00  (Resources)
+sj # sj -j 1468368 : check the queue time for your submitted job
+ Job ID: 1468368    Account: sbs_schunter                  2023-10-20 16:50:35
+╒═════════════════╤════════════════════════════════════════╤══════════════════╕
+│ User: jlkang    │ Name: diamond                          │ State: PENDING   │
+│  QoS: normal    │ Partition: amd                         │ Priority: 41180  │
+╞═════════════════╪════════════════════════════════════════╧══════════════════╡
+│      Submit     │ 2023-10-20 16:48:21                                       │
+│      Start      │ 2023-10-21 14:26:25                                       │
+│      End By     │ 2023-10-28 14:26:25                                       │
+╞═════════════════╪════════════════════╤══════════════════════════════════════╡
+│     Resource    │           Requests │ Current usage                        │
+├─────────────────┼────────────────────┼──────────────────────────────────────┤
+│         Node    │                  1 │ Pending for (Priority)...            │
+│          CPU    │                 32 │ Nil%                                 │
+│          RAM    │               32GB │ Nil%                                 │
+│    Wall time    │         7-00:00:00 │ 0:00                                 │
+│          GPU    │                N/A │ Nil                                  │
+└─────────────────┴────────────────────┴──────────────────────────────────────┘
 ```
